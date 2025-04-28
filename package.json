@@ -7,10 +7,16 @@
     "watch": "rbxtsc -w",
     "prepublishOnly": "npm run build"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "keywords": [
+    "roblox",
+    "typescript",
+    "javascript",
+    "natives",
+    "jsnatives"
+  ],
+  "author": "RsMan",
+  "license": "MIT",
+  "description": "A TypeScript library for Roblox that provides JavaScript-like native functionality, including Proxy implementation, Object utilities, setTimeout/setInterval implementations using Roblox's RunService, and JSON implementation.",
   "types": "out/index.d.ts",
   "files": [
     "out",
