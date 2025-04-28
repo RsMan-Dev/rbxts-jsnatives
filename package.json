@@ -14,7 +14,7 @@
     "natives",
     "jsnatives"
   ],
-  "author": "RsMan",
+  "author": "RsMan-Dev",
   "license": "MIT",
   "description": "A TypeScript library for Roblox that provides JavaScript-like native functionality, including Proxy implementation, Object utilities, setTimeout/setInterval implementations using Roblox's RunService, and JSON implementation.",
   "types": "out/index.d.ts",
