@@ -19,7 +19,7 @@ npm install @rbxts/jsnatives
 ``` -->
 from github directly:
 
-```typescript
+```bash
 npm install @rbxts/jsnatives@github:RsMan-Dev/rbxts-jsnatives
 ```
 
