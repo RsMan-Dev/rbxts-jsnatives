@@ -3,17 +3,17 @@ type ProxyTarget = Array<any> | Record<string | number, any>
 type LuaProxyHandler<T extends ProxyTarget> = {
   get?: (target: T, key: keyof T, proxy: T) => any;
   set?: (target: T, key: keyof T, value: unknown, proxy: T) => boolean;
-  call?: (target: T, proxy: T, ...args: unknown[]) => any;
+  apply?: (target: T, proxy: T, ...args: unknown[]) => any;
   ownKeys?: (target: T, proxy: T) => Array<keyof T>;
   iter?: (target: T, proxy: T) => ReturnType<typeof pairs<T>>;
 }
 
 export declare function proxy<T extends ProxyTarget, H extends LuaProxyHandler<T>, Raw = {}>(target: T, hooks: H, raw?: Raw, metaDefaults?: object):
-  T & Raw & (H extends { call: (target: T, ...args: infer A) => infer R } ? { (...args: A): R } : {})
+  T & Raw & (H extends { apply: (target: T, ...args: infer A) => infer R } ? { (...args: A): R } : {})
 
 type ProxyConstructor = {
   new <T extends ProxyTarget, H extends LuaProxyHandler<T>, Raw = {}>(target: T, hooks: H, raw?: Raw, metaDefaults?: object):
-    T & Raw & (H extends { call: (target: T, ...args: infer A) => infer R } ? { (...args: A): R } : {})
+    T & Raw & (H extends { apply: (target: T, ...args: infer A) => infer R } ? { (...args: A): R } : {})
 }
 
 export declare const Proxy: ProxyConstructor
@@ -61,6 +61,10 @@ type Object = {
   is: <T, U>(obj: T, other: U) => obj is T & U,
   equals: <T, U>(obj: T, other: U, deep?: boolean) => obj is T & U,
   toString: <T>(obj: T) => string,
+  isCallable: {
+    (obj: unknown): obj is Callback,
+    <T extends object>(obj: T): obj is T & Callback
+  },
 }
 
 export declare const Object: Object

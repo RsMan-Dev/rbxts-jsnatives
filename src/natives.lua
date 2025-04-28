@@ -75,6 +75,14 @@ local function proxy(target, hooks, raw, metatableDefaults)
     end
   end
 
+  metatableDefaults.__callable = function()
+    if hooks.apply then
+      return true
+    else
+      return Object.isCallable(target)
+    end
+  end
+
   metatableDefaults.__call = function(proxy, ...)
     if hooks.apply then
       return hooks.apply(target, proxy, ...)
@@ -258,6 +266,16 @@ end
 
 function Object.isEmpty(object)
 	return next(object) == nil
+end
+
+function Object.isCallable(object)
+  return type(object) == "function" or (
+    type(object) == "table" and
+    getmetatable(object) ~= nil and 
+    type(getmetatable(object).__call) == "function" and (
+      getmetatable(object).__callable == nil or getmetatable(object).__callable()
+    )
+  )
 end
 
 Module.Object = Object

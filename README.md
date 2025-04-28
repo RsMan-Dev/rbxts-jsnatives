@@ -43,7 +43,7 @@ const target = {}, obj = Proxy(target, {
   ownKeys: (target, proxy) => {
     return ["a", "b"];
   },
-  call: (target, proxy, ...args) => {
+  apply: (target, proxy, ...args) => {
     print(`Calling ${target} with ${args}`);
     return target(...args);
   },
