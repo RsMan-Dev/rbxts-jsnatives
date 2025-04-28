@@ -149,4 +149,4 @@ const parsed = JSON.parse(str); // { a: 1, b: 2 }
 
 ## License
 
-MIT
+ISC
