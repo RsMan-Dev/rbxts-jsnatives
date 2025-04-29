@@ -21,13 +21,17 @@ A TypeScript library for Roblox that provides JavaScript-like native functionali
 
 ## Installation
 
-Currently available through GitHub:
+Currently available through GitHub (to get the latest commited build, ensure using commit hash for stability):
 
 ```bash
 npm install @rbxts/jsnatives@github:RsMan-Dev/rbxts-jsnatives
 ```
 
-> Note: NPM package coming soon!
+Via NPM:
+
+```bash
+npm install @rbxts/jsnatives
+```
 
 ## Features
 
