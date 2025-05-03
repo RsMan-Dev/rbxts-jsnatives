@@ -1,8 +1,6 @@
 --!nocheck
 local ObjectModule = require(script.Parent.object)
 local Object = ObjectModule.Object
-local KEYS = ObjectModule.KEYS
-
 local Proxy = {}
 
 Proxy.new = function (target, hooks, raw, metatableDefaults)
@@ -28,8 +26,11 @@ Proxy.new = function (target, hooks, raw, metatableDefaults)
   end
 
   metatableDefaults.__index = function(proxy, key)
-    if key == KEYS then -- in case of protected metatable, we need to return the keys of the proxy using this reference
-      return metatableDefaults.__keys(proxy)
+    if key == "$$KEYS" then -- in case of protected metatable, we need to return the keys of the proxy using this reference
+      return metatableDefaults.__keys
+    end
+    if key == "$$PROXY" then
+      return proxy
     end
 
     if hooks.get then
@@ -78,7 +79,7 @@ Proxy.new = function (target, hooks, raw, metatableDefaults)
     if hooks.iter then
       return hooks.iter(target, proxy)
     end
-    local keys = Object.keys(proxy)
+    local keys = metatableDefaults.__keys(proxy)
     local i = 0
     return function(lastKey)
       if lastKey ~= nil and lastKey ~= keys[i] then

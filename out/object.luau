@@ -2,8 +2,6 @@
 --!nocheck
 local HttpService = game:GetService("HttpService")
 
-local KEYS = {}
-
 local function objK(key, value) return key end
 local function objV(key, value) return value end
 local function objE(key, value) return {key, value} end
@@ -20,7 +18,7 @@ local function keysFromMeta(object)
   local meta = getmetatable(object)
   local fun = nil
   if meta == false then -- protected metatable
-    fun = object[KEYS]
+    fun = object["$$KEYS"]
   elseif meta ~= nil then
     fun = meta.__keys
   end
@@ -113,6 +111,8 @@ end
 
 function Object.dup(object, deep, cache)
   if type(object) ~= "table" then return object end
+  -- objects with meta and not proxy are considered not dupeable
+  if(getmetatable(object) ~= nil and object["$$PROXY"] == nil) then return object end
 	local result = table.create(#object)
 	for _, k in Object.keys(object) do
     local v = object[k]
@@ -175,10 +175,13 @@ function Object.seal(object)
   for _, k in Object.keys(object) do
     keys[k] = true
   end
+  local function keysGetter()
+    return keys
+  end
   return setmetatable(object, {
     __index = function(_, k)
-      if k == KEYS then
-        return keys
+      if k == "$$KEYS" then
+        return keysGetter
       end
       return nil
     end,
@@ -237,5 +240,4 @@ end
 
 return { 
   Object = Object,
-  KEYS = KEYS,
 }
