@@ -10,7 +10,9 @@ function String.charCodeAt(str: string, index: (number | string)?): number
   if type(index) ~= "number" then index = tonumber(index) end
   if index == nil then error("index must be a number") end
 
-  if index < 1 or index > #str then return Number.NaN end
+  if index < 0 or index > #str - 1 then return Number.NaN end
+
+  index += 1 -- convert to lua indexing
 
   local offset = utf8.offset(str, index)
 
@@ -199,7 +201,7 @@ String.rep = string.rep
 function String.search(str: string, pattern: unknown): number
   if type(pattern) ~= "string" then pattern = tostring(pattern) end
   if pattern == nil then error("pattern must be a string") end
-  return string.find(str, pattern)
+  return (string.find(str, pattern) or -1)
 end
 
 function String.at(str: string, index: (number | string)): string
@@ -261,19 +263,19 @@ function String.toPascalCase(str: string): string
 end
 
 function String.toSnakeCase(str: string): string
-  return str:gsub("[%s%-_]+(%w)", function(c) return "_" .. c end):gsub("%u", function(c) return "_" .. c end):gsub("^_+", ""):lower()
+  return str:gsub("%u", function(c) return "_" .. c end):gsub("[%s%-_]+(%w)", function(c) return "_" .. c end):gsub("^_+", ""):lower()
 end
 
 function String.toKebabCase(str: string): string
-  return str:gsub("[%s%-_]+(%w)", function(c) return "-" .. c end):gsub("%u", function(c) return "-" .. c end):gsub("^-+", ""):lower()
+  return str:gsub("%u", function(c) return "-" .. c end):gsub("[%s%-_]+(%w)", function(c) return "-" .. c end):gsub("^-+", ""):lower()
 end
 
 function String.toTitleCase(str: string): string
-  return (str:gsub("[%s%-_]+(%w)", function(c) return " " .. c:upper() end):gsub("%u", function(c) return " " .. c:upper() end):gsub("^%s+(%l)", string.upper))
+  return (str:gsub("%u", function(c) return " " .. c:upper() end):gsub("[%s%-_]+(%w)", function(c) return " " .. c:upper() end):gsub("^%s+(%l)", string.upper))
 end
 
 function String.toSentenceCase(str: string): string
-  return (str:gsub("[%s%-_]+(%w)", function(c) return " " .. c:lower() end):gsub("%u", function(c) return " " .. c:lower() end):gsub("^%s+(%l)", string.upper))
+  return (str:gsub("%u", function(c) return " " .. c:lower() end):gsub("[%s%-_]+(%w)", function(c) return " " .. c:lower() end):gsub("^%s+(%l)", string.upper))
 end
 
 return {
