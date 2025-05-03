@@ -1,4 +1,5 @@
 ---@diagnostic disable: undefined-global
+--!nocheck
 local HttpService = game:GetService("HttpService")
 
 local KEYS = {}
@@ -174,14 +175,13 @@ function Object.seal(object)
   for _, k in Object.keys(object) do
     keys[k] = true
   end
-  -- supermeta will return keys that has been sealed for Object.keys, this way, a key with a nil value will be considered 
-  -- as a key that exists but nil, to respect Object.seal behavior from javascript's Object.seal
-  local supermeta = table.freeze({
-    __keys = function()
-      return keys
-    end
-  })
   return setmetatable(object, {
+    __index = function(_, k)
+      if k == KEYS then
+        return keys
+      end
+      return nil
+    end,
     __newindex = function(_, k)
       if not keys[k] then -- a key that was in object before can be set to nil and re-added, we are not considering keys has been deleted
         error("Cannot add new properties to an object that has extensions prevented.")

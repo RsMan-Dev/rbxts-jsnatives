@@ -4,7 +4,7 @@
 --!nocheck
 local HttpService = game:GetService("HttpService")
 
-local isArray = require(script.Parent.array_utils).isArray
+local isArray = require(script.Parent.array_utils).default.isArray
 
 -- local NULL = require(srcWorkspace.luaUtils.null)
 

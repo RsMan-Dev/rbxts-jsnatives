@@ -1,6 +1,6 @@
 -- many tips thanks to https://github.com/howmanysmall/luau-polyfill/blob/main/src/String
 --!nocheck
-local Number = require(script.Parent.number)
+local Number = require(script.Parent.number).default
 
 
 local String = {}

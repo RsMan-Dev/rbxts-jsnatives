@@ -1,8 +1,8 @@
 -- reference documentation: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent
 --!nocheck
 local HttpService = game:GetService("HttpService")
-local Error = require(script.Parent.error)
-local String = require(script.Parent.string)
+local Error = require(script.Parent.error).default
+local String = require(script.Parent.string).default
 
 local function encodeURIComponent(value: string): string
 	local valueLength = utf8.len(value)

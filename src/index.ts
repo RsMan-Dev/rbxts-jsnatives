@@ -13,8 +13,8 @@ import encodeUriComponent from "./encodeUriComponent"
 import { setTimeout, clearTimeout, setInterval, clearInterval } from "./timers"
 
 export {
-  Proxy, 
-  Object, 
+  Proxy,
+  Object,
   JSON, 
   ArrayUtils,
   Number,

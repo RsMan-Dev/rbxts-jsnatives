@@ -49,7 +49,7 @@ type Object = {
   },
   freeze: <T, Deep extends boolean>(obj: T, deep?: Deep) => Deep extends true ? DeepReadonly<T> : Readonly<T>,
   isFrozen: <T>(obj: T) => obj is Readonly<T>,
-  seal: <T>(obj: T) => Readonly<T>,
+  seal: <T>(obj: T) => Readonly<T>
 }
 
 export declare const Object: Object

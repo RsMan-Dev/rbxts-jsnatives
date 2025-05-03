@@ -1,6 +1,6 @@
 -- all thanks to https://github.com/howmanysmall/luau-polyfill/blob/main/src/Console/makeConsoleImpl.luau
 --!nocheck
-local inspect = require(script.Parent.inspect)
+local inspect = require(script.Parent.inspect).default
 
 local GetService = game.GetService
 local attemptedGetButFailed = false

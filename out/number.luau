@@ -172,20 +172,22 @@ Number.toString = function(value: number, radix: number?): string
 end
 
 
-return setmetatable(Number, {
-  __call = function(_, value: unknown)
-    if type(value) == "number" then
-      return value
-    elseif type(value) == "string" then
-      return Number.parseFloat(value)
-    elseif type(value) == "boolean" then
-      return value and 1 or 0
-    elseif type(value) == "table" then
-      if #value::{any} == 1 then
-        return Number.parseFloat((value::{any})[1])
+return {
+  default = setmetatable(Number, {
+    __call = function(_, value: unknown)
+      if type(value) == "number" then
+          return value
+      elseif type(value) == "string" then
+        return Number.parseFloat(value)
+      elseif type(value) == "boolean" then
+        return value and 1 or 0
+      elseif type(value) == "table" then
+        if #value::{any} == 1 then
+          return Number.parseFloat((value::{any})[1])
+        end
       end
-    end
 
-    return Number.NaN
-  end
-})
+      return Number.NaN
+    end
+  }),
+}
