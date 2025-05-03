@@ -1,6 +1,6 @@
 {
   "name": "@rbxts/jsnatives",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "main": "out/init.lua",
   "scripts": {
     "build": "rbxtsc",
@@ -16,7 +16,7 @@
   ],
   "author": "RsMan-Dev",
   "license": "MIT",
-  "description": "A TypeScript library for Roblox that provides JavaScript-like native functionality, including Proxy implementation, Object utilities, setTimeout/setInterval implementations using Roblox's RunService, and JSON implementation.",
+  "description": "A TypeScript library for Roblox that provides JavaScript-like native functionality, including Proxy, Object utilities, setTimeout/setInterval, JSON, and more.",
   "types": "out/index.d.ts",
   "files": [
     "out",
@@ -24,6 +24,10 @@
   ],
   "publishConfig": {
     "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/RsMan-Dev/rbxts-jsnatives.git"
   },
   "devDependencies": {
     "@rbxts/compiler-types": "^3.0.0-types.0",

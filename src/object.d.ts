@@ -1,27 +1,9 @@
-type ProxyTarget = Array<any> | Record<string | number, any>
-
-export type ProxyHandler<T extends ProxyTarget> = {
-  get?: (target: T, key: keyof T, proxy: T) => any;
-  set?: (target: T, key: keyof T, value: unknown, proxy: T) => boolean;
-  apply?: (target: T, proxy: T, ...args: unknown[]) => any;
-  ownKeys?: (target: T, proxy: T) => Array<keyof T>;
-  iter?: (target: T, proxy: T) => ReturnType<typeof pairs<T>>;
-}
-
-export declare function proxy<T extends ProxyTarget, H extends ProxyHandler<T>, Raw = {}>(target: T, hooks: H, raw?: Raw, metaDefaults?: object):
-  T & Raw & (H extends { apply: (target: T, ...args: infer A) => infer R } ? { (...args: A): R } : {})
-
-type ProxyConstructor = {
-  new <T extends ProxyTarget, H extends ProxyHandler<T>, Raw = {}>(target: T, hooks: H, raw?: Raw, metaDefaults?: object):
-    T & Raw & (H extends { apply: (target: T, ...args: infer A) => infer R } ? { (...args: A): R } : {})
-}
-
-export declare const Proxy: ProxyConstructor
 
 type ReduceObjectArray<T> = T extends object ? T extends [infer F, ...infer R] ? F & ReduceObjectArray<R> : T : never
 
+type DeepReadonly<T> = T extends object ? { readonly [K in keyof T]: DeepReadonly<T[K]> } : T
+
 type Object = {
-  isArray: <T>(obj: T) => obj is T & Array<unknown>,
   create: <T>(obj?: T | undefined) => T extends undefined ? {} : T & {},
   keys: {
     <T>(obj: ReadonlyArray<T>): Array<number>,
@@ -65,6 +47,9 @@ type Object = {
     (obj: unknown): obj is Callback,
     <T extends object>(obj: T): obj is T & Callback
   },
+  freeze: <T, Deep extends boolean>(obj: T, deep?: Deep) => Deep extends true ? DeepReadonly<T> : Readonly<T>,
+  isFrozen: <T>(obj: T) => obj is Readonly<T>,
+  seal: <T>(obj: T) => Readonly<T>,
 }
 
 export declare const Object: Object
