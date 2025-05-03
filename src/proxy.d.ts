@@ -1,17 +1,23 @@
-export type ProxyTarget = Array<any> | Record<string | number, any> | Set<any> | Map<any, any>
+type ProxyTarget = Array<any> | Record<string | number, any> | Set<any> | Map<any, any> | Callback
 
-export type ProxyHandler<T extends ProxyTarget> = {
-  get?: (target: T, key: keyof T, proxy: T) => any;
-  set?: (target: T, key: keyof T, value: unknown, proxy: T) => boolean;
-  apply?: (target: T, proxy: T, ...args: unknown[]) => any;
-  ownKeys?: (target: T, proxy: T) => Array<keyof T>;
-  iter?: (target: T, proxy: T) => ReturnType<typeof pairs<T>>;
-  len?: (target: T, proxy: T) => number;
+type ProxyResult<T extends ProxyTarget, Hooks extends ProxyHandler<T>> = T & (Hooks extends { apply: (target: T, ...args: infer A) => infer R } ? { (...args: A): R } : {})
+
+interface ProxyHandler<T extends ProxyTarget> {
+  get?: (target: T, key: unknown, proxy: ProxyResult<T, this>) => any;
+  set?: (target: T, key: unknown, value: unknown, proxy: ProxyResult<T, this>) => boolean;
+  apply?: (target: T, proxy: ProxyResult<T, this>, ...args: unknown[]) => any;
+  ownKeys?: (target: T, proxy: ProxyResult<T, this>) => Array<keyof T>;
+  iter?: (target: T, proxy: ProxyResult<T, this>) => ReturnType<typeof pairs<T>>;
+  len?: (target: T, proxy: ProxyResult<T, this>) => number;
 }
 
 type ProxyConstructor = {
-  new <T extends ProxyTarget, H extends ProxyHandler<T>, Raw = {}>(target: T, hooks: H, raw?: Raw, metaDefaults?: object):
-    T & Raw & (H extends { apply: (target: T, ...args: infer A) => infer R } ? { (...args: A): R } : {})
+  new <T extends ProxyTarget, H extends ProxyHandler<T>, Raw = {}>(
+    target: T, 
+    hooks: H, 
+    raw?: Raw, 
+    metaDefaults?: object
+  ): ProxyResult<T, H>
 }
 
 declare const Proxy: ProxyConstructor

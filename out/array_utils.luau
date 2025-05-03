@@ -130,12 +130,12 @@ end
 
 function ArrayUtils.splice(array, start, count, ...)
   if not ArrayUtils.isArray(array) then error("array must be an array") end
-
                                                           -- For an array [1, 2, 3, 4, 5]
   if start == nil then start = 0 end                      -- if start is nil, set it to 0
   if type(start) ~= "number" then error("start must be a number") end
   if start < 0 then start = #array - 1 - (start * -1) end -- if start is -2, then it's 3
   if start < 0 then start = 0 end                         -- if start is still negative, set it to 0
+  if start > #array then start = #array end               -- if start is greater than the length of the array, set it to the length of the array
   if count == nil then count = #array - start end         -- if count is nil, set it to the difference between the length of the array and start
   if type(count) ~= "number" then error("count must be a number") end
   if count < 0 then count = 0 end                         -- if count is still negative, set it to 0
@@ -153,7 +153,7 @@ function ArrayUtils.splice(array, start, count, ...)
   end
 
   for i = select("#", ...), 1, -1 do
-    table.insert(array, start, select(i, ...))
+    table.insert(array, start, (select(i, ...)))
   end
   
   return deleted
