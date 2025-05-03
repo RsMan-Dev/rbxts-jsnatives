@@ -227,6 +227,7 @@ end
 function padInit(str: string, length: unknown, fillString: string): string
   if type(length) ~= "number" then length = tonumber(length) or 0 end
   if type(fillString) ~= "string" then fillString = tostring(fillString) or " " end
+  if fillString == "" then fillString = " " end
   if length <= #str then return str end
   local generateLength = length - #str
   return string.sub(string.rep(fillString, math.ceil(generateLength / #fillString)), 1, generateLength)
