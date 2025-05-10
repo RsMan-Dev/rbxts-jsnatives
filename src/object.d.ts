@@ -3,6 +3,22 @@ type ReduceObjectArray<T> = T extends object ? T extends [infer F, ...infer R] ?
 
 type DeepReadonly<T> = T extends object ? { readonly [K in keyof T]: DeepReadonly<T[K]> } : T
 
+type DeepPartial<T> = T extends object ? { [K in keyof T]?: DeepPartial<T[K]> } : T
+
+type Diff<T, U, Deep extends boolean> = T extends object 
+? U extends object 
+  ? {
+    [K in keyof T]?: K extends keyof U 
+      ? Deep extends true 
+        ? Diff<T[K], U[K], Deep> 
+        : T[K] 
+      : T[K]
+    } & {
+      [K in Exclude<keyof U, keyof T>]?: Object["diffDeletedSymbol"]
+    } 
+  : {}
+: T | undefined
+
 type Object = {
   create: <T>(obj?: T | undefined) => T extends undefined ? {} : T & {},
   keys: {
@@ -49,7 +65,10 @@ type Object = {
   },
   freeze: <T, Deep extends boolean>(obj: T, deep?: Deep) => Deep extends true ? DeepReadonly<T> : Readonly<T>,
   isFrozen: <T>(obj: T) => obj is Readonly<T>,
-  seal: <T>(obj: T) => Readonly<T>
+  seal: <T>(obj: T) => Readonly<T>,
+  excludeTypes: <T, Deep extends boolean>(obj: T, types: (keyof CheckableTypes)[] | Set<keyof CheckableTypes>, deep?: Deep) => Deep extends true ? DeepPartial<T> : Partial<T>,
+  diffDeletedSymbol: symbol,
+  diff: <T, U, Deep extends boolean>(current: T, newData: U, deep?: Deep) => Diff<T, U, Deep>,
 }
 
 export declare const Object: Object

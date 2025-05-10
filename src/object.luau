@@ -109,10 +109,15 @@ function Object.hasOwn(object, key)
   return object[key] ~= nil and object[key] ~= Object[key]
 end
 
+function isObjectOrProxyNotAnyClass(object)
+  if type(object) ~= "table" then return false end    -- not a table
+  if getmetatable(object) == nil then return true end -- not has no meta
+  if object["$$PROXY"] ~= nil then return true end    -- has meta but is a proxy
+  return false
+end
+
 function Object.dup(object, deep, cache)
-  if type(object) ~= "table" then return object end
-  -- objects with meta and not proxy are considered not dupeable
-  if(getmetatable(object) ~= nil and object["$$PROXY"] == nil) then return object end
+  if not isObjectOrProxyNotAnyClass(object) then return object end -- cannot duplicate complex objects
 	local result = table.create(#object)
 	for _, k in Object.keys(object) do
     local v = object[k]
@@ -236,6 +241,102 @@ function Object.isCallable(object)
       getmetatable(object).__callable == nil or getmetatable(object).__callable()
     )
   )
+end
+
+
+
+--[[
+function makePatch<T extends object>(current: T, newData: T, patchObject: Partial<T> = {}): Partial<T> {
+  const keys = new Set<string | number | symbol>([...Object.keys(current), ...Object.keys(newData)]);
+
+  for (const key of keys) {
+    const currentValue = (current as Target)[key];
+    const newValue = (newData as Target)[key];
+
+    switch (typeOf(currentValue)) {
+      case "function":
+      case "thread":
+      case "userdata":
+      case "buffer":
+        break; // Ignore these types, they are not serializable
+      case "nil":
+        if (newValue !== undefined) {
+          (patchObject as Target)[key] = newValue;
+        }
+        break;
+      case "table":
+        if (typeOf(newValue) === "table") {
+          const nestedPatch = makePatch(currentValue as object, newValue as object);
+          if (!Object.isEmpty(nestedPatch)) {
+            (patchObject as Target)[key] = nestedPatch;
+          }
+        } else {
+          (patchObject as Target)[key] = newValue;
+        }
+        break;
+      default:
+        // Considering all other values are primitives or overrides __eq metamethod
+        if (newValue === undefined) {
+          (patchObject as Target)[key] = DELETE;
+        } else if (currentValue !== newValue) {
+          (patchObject as Target)[key] = newValue;
+        }
+    }
+  }
+
+  return patchObject;
+}
+]]
+
+function Object.excludeTypes(value, types, deep)
+  if not isObjectOrProxyNotAnyClass(value) then return value end -- cannot exclude types on complex objects
+  local nextIndex, nextValue = next(types)
+  if nextIndex == nil then return value end
+  if type(nextValue) ~= "boolean" then --not a set yet
+    local typesArr = types
+    types = {}
+    for _, t in typesArr do types[t] = true end
+  elseif type(nextValue) ~= "string" then
+    error("types must be an array of strings")
+  end
+  for _, k in Object.keys(value) do
+    local v = value[k]
+    if type(v) == "table" and deep then
+      value[k] = Object.excludeTypes(v, types, deep)
+    end
+    if types[type(v)] then
+      value[k] = nil
+    end
+  end
+  return value
+end
+
+Object.diffDeletedSymbol = {}
+
+function Object.diff(current, other, deep)
+  if not isObjectOrProxyNotAnyClass(current) or not isObjectOrProxyNotAnyClass(other) then 
+    if current == other then return nil end
+    return current
+  end
+  local diffed = Object.create(nil)
+  local set = Object.create(nil)
+  for _, k in Object.keys(current) do set[k] = true end
+  for _, k in Object.keys(other) do set[k] = true end
+  for k in set do
+    local cv = current[k]
+    local ov = other[k]
+    if type(cv) == "table" and type(ov) == "table" and deep then
+      local result = Object.diff(cv, ov, deep)
+      if not Object.isEmpty(result) then
+        diffed[k] = result
+      end
+    elseif cv == nil and ov ~= nil then
+      diffed[k] = Object.diffDeletedSymbol
+    elseif cv ~= ov then
+      diffed[k] = cv
+    end
+  end
+  return diffed
 end
 
 return { 
