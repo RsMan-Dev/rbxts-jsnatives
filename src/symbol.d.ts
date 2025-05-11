@@ -4,8 +4,23 @@ type SymbolCallable = {
 }
 
 declare interface SymbolConstructor extends SymbolCallable {
+  /**
+   * Creates a new symbol.
+   * @param name - The name of the symbol.
+   * @returns A new symbol.
+   */
   new(name: string): symbol
+  /**
+   * Returns a symbol from a string. (Mimics JavaScript's `Symbol.for`) using global registry.
+   * @param key - The key of the symbol.
+   * @returns A symbol.
+   */
   for(key: string): symbol
+  /**
+   * Checks if the given value is a symbol.
+   * @param value - The value to check.
+   * @returns Whether the value is a symbol.
+   */
   isSymbol(value: any): value is symbol
 }
 

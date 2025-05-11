@@ -7,6 +7,12 @@ local timeouts = setmetatable({}, {
 local intervals = setmetatable({}, {
 	__mode = "k",
 })
+--[[
+	*
+	 * Clears a timeout.
+	 * @param sym - The symbol of the timeout to clear.
+	 
+]]
 local function clearTimeout(sym)
 	local _condition = sym ~= nil
 	if _condition then
@@ -22,6 +28,14 @@ local function clearTimeout(sym)
 		timeouts[_sym] = nil
 	end
 end
+--[[
+	*
+	 * Sets a timeout.
+	 * @param cb - The callback to execute after the timeout.
+	 * @param ms - The timeout in milliseconds.
+	 * @returns The symbol of the timeout.
+	 
+]]
 local function setTimeout(cb, ms)
 	if ms == nil then
 		ms = 0
@@ -40,6 +54,14 @@ local function setTimeout(cb, ms)
 	end
 	return sym
 end
+--[[
+	*
+	 * Sets an interval.
+	 * @param cb - The callback to execute after the interval.
+	 * @param ms - The interval in milliseconds.
+	 * @returns The symbol of the interval.
+	 
+]]
 local function setInterval(cb, ms)
 	if ms == nil then
 		ms = 0
@@ -62,6 +84,12 @@ local function setInterval(cb, ms)
 	end
 	return sym
 end
+--[[
+	*
+	 * Clears an interval.
+	 * @param sym - The symbol of the interval to clear.
+	 
+]]
 local function clearInterval(sym)
 	local _condition = sym ~= nil
 	if _condition then

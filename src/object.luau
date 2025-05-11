@@ -243,51 +243,6 @@ function Object.isCallable(object)
   )
 end
 
-
-
---[[
-function makePatch<T extends object>(current: T, newData: T, patchObject: Partial<T> = {}): Partial<T> {
-  const keys = new Set<string | number | symbol>([...Object.keys(current), ...Object.keys(newData)]);
-
-  for (const key of keys) {
-    const currentValue = (current as Target)[key];
-    const newValue = (newData as Target)[key];
-
-    switch (typeOf(currentValue)) {
-      case "function":
-      case "thread":
-      case "userdata":
-      case "buffer":
-        break; // Ignore these types, they are not serializable
-      case "nil":
-        if (newValue !== undefined) {
-          (patchObject as Target)[key] = newValue;
-        }
-        break;
-      case "table":
-        if (typeOf(newValue) === "table") {
-          const nestedPatch = makePatch(currentValue as object, newValue as object);
-          if (!Object.isEmpty(nestedPatch)) {
-            (patchObject as Target)[key] = nestedPatch;
-          }
-        } else {
-          (patchObject as Target)[key] = newValue;
-        }
-        break;
-      default:
-        // Considering all other values are primitives or overrides __eq metamethod
-        if (newValue === undefined) {
-          (patchObject as Target)[key] = DELETE;
-        } else if (currentValue !== newValue) {
-          (patchObject as Target)[key] = newValue;
-        }
-    }
-  }
-
-  return patchObject;
-}
-]]
-
 function Object.excludeTypes(value, types, deep)
   if not isObjectOrProxyNotAnyClass(value) then return value end -- cannot exclude types on complex objects
   local nextIndex, nextValue = next(types)
