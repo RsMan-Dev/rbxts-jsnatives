@@ -69,6 +69,7 @@ type Object = {
   excludeTypes: <T, Deep extends boolean>(obj: T, types: (keyof CheckableTypes)[] | Set<keyof CheckableTypes>, deep?: Deep) => Deep extends true ? DeepPartial<T> : Partial<T>,
   diffDeletedSymbol: symbol,
   diff: <T, U, Deep extends boolean>(current: T, newData: U, deep?: Deep) => Diff<T, U, Deep>,
+  patch: <T, U, Deep extends boolean>(current: T, diff: U, deep?: Deep) => T,
 }
 
 export declare const Object: Object

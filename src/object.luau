@@ -339,6 +339,20 @@ function Object.diff(current, other, deep)
   return diffed
 end
 
+function Object.patch(current, diff, deep)
+  if not isObjectOrProxyNotAnyClass(current) or not isObjectOrProxyNotAnyClass(diff) then return current end
+  for _, k in Object.keys(diff) do
+    local v = diff[k]
+    if v == Object.diffDeletedSymbol then
+      current[k] = nil
+    elseif type(v) == "table" and type(current[k]) == "table" and deep then
+      current[k] = Object.patch(current[k], v, deep)
+    else
+      current[k] = v
+    end
+  end
+  return current
+end
 return { 
   Object = Object,
 }
