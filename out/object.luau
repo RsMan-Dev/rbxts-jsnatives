@@ -251,7 +251,7 @@ function Object.excludeTypes(value, types, deep)
     local typesArr = types
     types = {}
     for _, t in typesArr do types[t] = true end
-  elseif type(nextValue) ~= "string" then
+  elseif type(nextValue) ~= "string" and type(nextValue) ~= "boolean" then -- not a a transformed set or a string array
     error("types must be an array of strings")
   end
   for _, k in Object.keys(value) do
