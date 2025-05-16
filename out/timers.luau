@@ -40,15 +40,17 @@ local function setTimeout(cb, ms)
 	if ms == nil then
 		ms = 0
 	end
-	local sym = Symbol("timeout")
 	local active = true
-	task.delay(ms / 1000, function()
+	local sym
+	local sym = Symbol("timeout")
+	local thread = task.delay(ms / 1000, function()
 		if not active then
 			return nil
 		end
 		cb(sym)
 	end)
 	timeouts[sym] = function()
+		task.cancel(thread)
 		active = false
 		return active
 	end
@@ -68,9 +70,16 @@ local function setInterval(cb, ms)
 	end
 	local sym = Symbol("interval")
 	local active = true
+	local thread = nil
 	local run
 	run = function()
-		return task.delay(ms / 1000, function()
+		if not active then
+			return nil
+		end
+		if thread then
+			task.cancel(thread)
+		end
+		thread = task.delay(ms / 1000, function()
 			if not active then
 				return nil
 			end
@@ -78,7 +87,11 @@ local function setInterval(cb, ms)
 			run()
 		end)
 	end
+	run()
 	intervals[sym] = function()
+		if thread then
+			task.cancel(thread)
+		end
 		active = false
 		return active
 	end

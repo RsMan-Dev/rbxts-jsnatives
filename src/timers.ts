@@ -19,13 +19,15 @@ export function clearTimeout(sym: symbol | undefined) {
  * @returns The symbol of the timeout.
  */
 export function setTimeout(cb: (sym: symbol) => void, ms = 0) {
-  const sym = Symbol("timeout");
   let active = true;
-  task.delay(ms / 1000, () => {
+  const sym = Symbol("timeout"), thread = task.delay(ms / 1000, () => {
     if (!active) return;
     cb(sym);
   })
-  timeouts.set(sym, () => active = false);
+  timeouts.set(sym, () => {
+    task.cancel(thread);
+    return active = false;
+  });
   return sym;
 }
 
@@ -37,13 +39,21 @@ export function setTimeout(cb: (sym: symbol) => void, ms = 0) {
  */
 export function setInterval(cb: (sym: symbol) => void, ms = 0) {
   const sym = Symbol("interval");
-  let active = true;
-  const run = () => task.delay(ms / 1000, () => {
+  let active = true, thread: thread | undefined = undefined;
+  const run = () => {
     if (!active) return;
-    cb(sym);
-    run();
-  })
-  intervals.set(sym, () => active = false);
+    if (thread) task.cancel(thread);
+    thread = task.delay(ms / 1000, () => {
+      if (!active) return;
+      cb(sym);
+      run();
+    })
+  }
+  run();
+  intervals.set(sym, () => {
+    if (thread) task.cancel(thread);
+    return active = false;
+  });
   return sym;
 }
 
