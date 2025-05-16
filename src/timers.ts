@@ -3,6 +3,18 @@ import Symbol from "./symbol";
 const timeouts = new WeakMap<symbol, () => false>();
 const intervals = new WeakMap<symbol, () => false>();
 
+function tryCancelThread(thread: thread | undefined) {
+  if (thread) {
+    const status = coroutine.status(thread);
+    if (status !== "dead" && status !== "running") { // running and dead threads are not cancellable
+      try{  // sometimes the thread is suspended because it ran another task, still not cancellable
+        task.cancel(thread);
+      } catch(_) {
+      }
+    }
+  }
+}
+
 
 /**
  * Clears a timeout.
@@ -25,7 +37,7 @@ export function setTimeout(cb: (sym: symbol) => void, ms = 0) {
     cb(sym);
   })
   timeouts.set(sym, () => {
-    task.cancel(thread);
+    tryCancelThread(thread);
     return active = false;
   });
   return sym;
@@ -39,21 +51,23 @@ export function setTimeout(cb: (sym: symbol) => void, ms = 0) {
  */
 export function setInterval(cb: (sym: symbol) => void, ms = 0) {
   const sym = Symbol("interval");
-  let active = true, thread: thread | undefined = undefined;
+  let active = true, clean: (() => false) | undefined;
   const run = () => {
     if (!active) return;
-    if (thread) task.cancel(thread);
-    thread = task.delay(ms / 1000, () => {
+    if (clean !== undefined) clean();
+    const thread = task.delay(ms / 1000, () => {
       if (!active) return;
       cb(sym);
       run();
     })
+    clean = () => {
+      clean = undefined;
+      tryCancelThread(thread);
+      return active = false;
+    }
   }
   run();
-  intervals.set(sym, () => {
-    if (thread) task.cancel(thread);
-    return active = false;
-  });
+  intervals.set(sym, () => clean !== undefined ? clean() : active = false);
   return sym;
 }
 

@@ -7,6 +7,16 @@ local timeouts = setmetatable({}, {
 local intervals = setmetatable({}, {
 	__mode = "k",
 })
+local function tryCancelThread(thread)
+	if thread then
+		local status = coroutine.status(thread)
+		if status ~= "dead" and status ~= "running" then
+			TS.try(function()
+				task.cancel(thread)
+			end, function(_) end)
+		end
+	end
+end
 --[[
 	*
 	 * Clears a timeout.
@@ -50,7 +60,7 @@ local function setTimeout(cb, ms)
 		cb(sym)
 	end)
 	timeouts[sym] = function()
-		task.cancel(thread)
+		tryCancelThread(thread)
 		active = false
 		return active
 	end
@@ -70,30 +80,39 @@ local function setInterval(cb, ms)
 	end
 	local sym = Symbol("interval")
 	local active = true
-	local thread = nil
+	local clean
 	local run
 	run = function()
 		if not active then
 			return nil
 		end
-		if thread then
-			task.cancel(thread)
+		if clean ~= nil then
+			clean()
 		end
-		thread = task.delay(ms / 1000, function()
+		local thread = task.delay(ms / 1000, function()
 			if not active then
 				return nil
 			end
 			cb(sym)
 			run()
 		end)
+		clean = function()
+			clean = nil
+			tryCancelThread(thread)
+			active = false
+			return active
+		end
 	end
 	run()
 	intervals[sym] = function()
-		if thread then
-			task.cancel(thread)
+		local _result
+		if clean ~= nil then
+			_result = clean()
+		else
+			active = false
+			_result = active
 		end
-		active = false
-		return active
+		return _result
 	end
 	return sym
 end
