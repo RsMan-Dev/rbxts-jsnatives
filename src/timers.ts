@@ -58,6 +58,7 @@ export function setInterval(cb: (sym: symbol) => void, ms = 0) {
     const thread = task.delay(ms / 1000, () => {
       if (!active) return;
       cb(sym);
+      clean = undefined;
       run();
     })
     clean = () => {

@@ -94,6 +94,7 @@ local function setInterval(cb, ms)
 				return nil
 			end
 			cb(sym)
+			clean = nil
 			run()
 		end)
 		clean = function()
